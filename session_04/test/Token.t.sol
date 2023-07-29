@@ -30,10 +30,33 @@ contract TokenTest is Test {
         assertEqUint(totalSupply, _totalSupply);
     }
 
-    function testBalance_ShouldREturnDeployerBalance_WhenCallToBalance()
-        public
-    {
+    function testBalance_ShouldREturnDeployerBalance_WhenCallToBalance() public {
         uint256 deployerBalance = vbiToken.balanceOf(deployer);
+        assertEqUint(deployerBalance, _totalSupply);
+    }
+
+    function testBalance_ShouldREturnDeployerBalance_WhenLowLevelCallToBalance() public {
+        // Don't know interface or don't want to expose interface of _vbiAddress
+        // Apply design pattern
+        /**
+         * transaction {
+         *  from: this contract = address(this)
+         *  to: _vbiAddress
+         *  data: abi.encode(0x70a08231)
+         *  value: 0
+         *  nonce: default
+         * }
+         */
+        bytes memory callData = abi.encode(0x70a08231, deployer);
+        bytes memory callDataWithEncodeCall = abi.encodeCall(Token.balanceOf, deployer);
+        (bool success, bytes memory result) = _vbiAddress.call(callDataWithEncodeCall);
+        emit log_named_bytes("calldata", callData);
+        emit log_named_bytes("callDataWithEncodeCall", callDataWithEncodeCall);
+        require(success, "error");
+        // abi.encode -> encode and concate data together -> bytes
+        // abi.encodePacked -> return string
+        uint256 deployerBalance = abi.decode(result, (uint256));
+        emit log_named_uint(string(abi.encodePacked("deployerBalance ", address(deployer))), deployerBalance);
         assertEqUint(deployerBalance, _totalSupply);
     }
 
@@ -54,9 +77,7 @@ contract TokenTest is Test {
     event Transfer(address indexed from, address indexed to, uint256 amount);
 
     // Fuzzing test
-    function testTransfer_ShouldSuccess_WhenTransferToAliceFuzz(
-        uint256 amount
-    ) public {
+    function testTransfer_ShouldSuccess_WhenTransferToAliceFuzz(uint256 amount) public {
         vm.assume(amount > 0);
         vm.assume(amount <= 999);
         //setUp
