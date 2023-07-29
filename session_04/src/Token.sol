@@ -27,11 +27,7 @@ contract Token is IERC20 {
 
     address private _owner;
 
-    constructor(
-        string memory name_,
-        string memory symbol_,
-        uint256 totalSupply_
-    ) {
+    constructor(string memory name_, string memory symbol_, uint256 totalSupply_) {
         _name = name_;
         _symbol = symbol_;
         _totalSupply = totalSupply_;
@@ -54,6 +50,8 @@ contract Token is IERC20 {
     }
 
     function balanceOf(
+        // function selector = function ID = bytes4(hash(function_name))
+        // ex: bytes4(hash(balanceof(address)))
         address account
     ) external view override returns (uint256) {
         return _balances[account];
@@ -65,10 +63,7 @@ contract Token is IERC20 {
      * Rebase tokens
      */
 
-    function transfer(
-        address to,
-        uint256 amount
-    ) external override returns (bool) {
+    function transfer(address to, uint256 amount) external override returns (bool) {
         require(_balances[msg.sender] >= amount, "Insufficient balance");
         require(amount > 0, "Amount must be greater than 0");
 
@@ -85,19 +80,13 @@ contract Token is IERC20 {
         return true;
     }
 
-    function allowance(
-        address owner_,
-        address spender_
-    ) external view override returns (uint256) {
+    function allowance(address owner_, address spender_) external view override returns (uint256) {
         return _allowances[owner_][spender_];
     }
 
     // Hay approve tối đa type(uint256).max
     // -> spender có quyền tiêu hết token trong tài khoảng của approver
-    function approve(
-        address spender,
-        uint256 amount
-    ) external override returns (bool) {
+    function approve(address spender, uint256 amount) external override returns (bool) {
         _allowances[msg.sender][spender] = amount;
 
         emit Approval(msg.sender, spender, amount);
@@ -105,18 +94,11 @@ contract Token is IERC20 {
         return true;
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) external override returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) external override returns (bool) {
         require(_balances[from] >= amount, "Insufficient balance");
         require(amount > 0, "Amount must be greater than 0");
         require(_allowances[from][to] >= amount, "Insufficient allowance");
-        require(
-            _balances[to] >= type(uint256).max - amount,
-            "Ballance is too large"
-        );
+        require(_balances[to] >= type(uint256).max - amount, "Ballance is too large");
 
         _balances[from] -= amount;
         _balances[to] += amount;
