@@ -47,7 +47,8 @@ contract TokenTest is Test {
          *  nonce: default
          * }
          */
-        bytes memory callData = abi.encode(0x70a08231, deployer);
+        // function signature
+        bytes memory callData = bytes.concat(bytes4(0x70a08231), abi.encode(deployer));
         bytes memory callDataWithEncodeCall = abi.encodeCall(Token.balanceOf, deployer);
         (bool success, bytes memory result) = _vbiAddress.call(callDataWithEncodeCall);
         emit log_named_bytes("calldata", callData);
@@ -58,6 +59,7 @@ contract TokenTest is Test {
         uint256 deployerBalance = abi.decode(result, (uint256));
         emit log_named_uint(string(abi.encodePacked("deployerBalance ", address(deployer))), deployerBalance);
         assertEqUint(deployerBalance, _totalSupply);
+        assertEq(callData, callDataWithEncodeCall);
     }
 
     function testTransfer_ShouldSuccess_WhenTransferToAlice() public {
