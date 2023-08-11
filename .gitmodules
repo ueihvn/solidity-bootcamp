@@ -7,3 +7,6 @@
 [submodule "cryptozombies/lib/forge-std"]
 	path = cryptozombies/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "cryptozombies/lib/openzeppelin-contracts"]
+	path = cryptozombies/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
