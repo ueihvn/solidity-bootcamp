@@ -49,5 +49,5 @@ contract ZombieFeeding is ZombieFactory {
         uint kittyDna;
         (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
         feedAndMultiply(_zombieId, kittyDna,"kitty");
-  }
+    }
 }
