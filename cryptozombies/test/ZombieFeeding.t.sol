@@ -21,6 +21,7 @@ contract ZombieFeedingTest is Test {
         //setUp
         zombieFeeding.createRandomZombie(_name);
         //execution
+        vm.warp(block.timestamp + 1 days);
         zombieFeeding.feedOnKitty(0,1);
         //assert
     }
